@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="gb2312" standalone="no"?>
+<!-- 配置信息-->
+<Config>
+  <ConfigData>
+    <ConfigItem Inaddr="1" V_Value="1" SigDes="业务数据内容"/>
+    <ConfigItem Inaddr="2" V_Value="192.101.2.1" SigDes="业务主站IP地址"/>
+    <ConfigItem Inaddr="3" V_Value="5051" SigDes="业务主站端口"/>
+    <ConfigItem Inaddr="4" V_Value="172.17.0.1" SigDes="业务容器IP地址"/>
+    <ConfigItem Inaddr="5" V_Value="2404" SigDes="业务容器端口"/>
+    <ConfigItem Inaddr="6" V_Value="172.32.30.215" SigDes="管理主站IP地址"/>
+    <ConfigItem Inaddr="7" V_Value="24041" SigDes="管理主站端口"/>
+    <ConfigItem Inaddr="8" V_Value="T231315TR002201912190082" SigDes="终端ID"/>
+    <ConfigItem Inaddr="9" V_Value="10" SigDes="认证过程超时时间(s)"/>
+    <ConfigItem Inaddr="10" V_Value="45" SigDes="AC 建链超时时间(s)"/>
+    <ConfigItem Inaddr="11" V_Value="1" SigDes="Debug日志"/>
+    <ConfigItem Inaddr="12" V_Value="0" SigDes="业务通道模式(0-IEC104 1-MQTT)"/>
+    <ConfigItem Inaddr="13" V_Value="1" SigDes="管理通道模式(0-AGENT1 1-AGENT2)"/>
+    <ConfigItem Inaddr="14" V_Value="0" SigDes="SSAL使能(0-不使能 1-使能)"/>
+  </ConfigData> 
+</Config>

@@ -1,0 +1,23 @@
+{
+    "id": "10001",
+    "gw_ip": "10.11.19.28",
+    "gw_port": 2404,
+    "channel": [
+        {
+            "dst_ip": "21.42.23.237",
+            "dst_port": 11883,
+            "local_ip": "0.0.0.0",
+            "local_port": 22404,
+            "apdu_ver": 16
+        },
+        {
+            "dst_ip": "21.42.23.237",
+            "dst_port": 11883,
+            "local_ip": "0.0.0.0",
+            "local_port": 22404,
+            "apdu_ver": 15 
+        }
+
+ 
+    ]
+}

@@ -1,0 +1,78 @@
+deviceType: T20
+deviceName: 000001
+deviceSN: 2102351HNF10H7000012
+deviceTag: SZBC2019.12
+deviceStatus: 正常
+vendorInfo: BEIJING SMARTCHIP MICROELECTRONICS TECHNOLOGY COMPANY LIMITED
+hardVersion: HV02.01
+hardwareModel: SCM701
+kernelVersion: KV01.018
+rootfsVersion: RV01.008
+server:
+  business:
+    main:
+      ipv4:
+        ip: 192.168.1.16
+        port: 1883
+        userName: my
+        passWord: 
+      ipv6:
+        ip: fe80::c10c:9d86:382f:4797
+        port: 1883
+    spare:
+      ipv4:
+        ip: 192.168.1.2
+        port: 1883
+      ipv6:
+        ip: fe80::c10c:9d86:382f:4798
+        port: 1883
+  maintain:
+    main:
+      ipv4:
+        ip: {{ ip }}
+        port: {{ port }}
+        userName: subpub
+        passWord: 0723a93adf06c5ea
+      ipv6:
+        ip: fe80::c10c:9d86:382f:4797
+        port: 1883
+    spare:
+      ipv4:
+        ip: 192.168.1.2
+        port: 6443
+      ipv6:
+        ip: fe80::c10c:9d86:382f:4798
+        port: 6443
+alarmInterval: 5
+cpuAlarm:
+  upper: 90
+ramAlarm:
+  upper: 90
+diskAlarm:
+  upper: 80
+tempAlarm:
+  interval: 10
+  upper: 125
+  lower: -40
+docker:
+  interval: 6
+  cpu: 90 
+  ram: 90
+  disk: 90
+app:
+  interval: 7
+  cpu: 82
+  ram: 83
+watchdog:
+  interval: 5
+  processes:
+    - name: ls
+      cmdline: ls -l
+    - name: pwd
+      cmdline: pwd --help
+reportPeriod:
+  dev: 120
+  container: 120
+  app: 120
+mqttFileTransfer: 0
+heartbeatInterval: 120
