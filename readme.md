@@ -15,4 +15,8 @@ https://github.com/paramiko/paramiko
 ### 2. process bar
 https://github.com/verigak/progress
 
-### 
+### register
+生成注册码
+```
+createCode()
+```
