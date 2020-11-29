@@ -20,3 +20,7 @@ https://github.com/verigak/progress
 ```
 createCode()
 ```
+### pyinstaller 
+```
+pyinstaller --onefile main.py
+```
