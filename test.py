@@ -17,5 +17,5 @@ dict = defaultdict(list)
 for list in my_list:
     data = list.split(",")
     dict[data[0]] = data[1:]
-    # print(data[1:])
+    # print(data[1])
 print(len(dict['sdsd']))

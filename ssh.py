@@ -10,6 +10,7 @@ sftp = None
 
 RC_LOCAL_PATH = "/etc/rc.local"
 
+
 def login(config_file):
 
     config.read(config_file, encoding='utf-8')
@@ -55,14 +56,13 @@ def setup_SDK(trans):
     # sftp.put(localpath=localpath, remotepath=remotepath)
     sftp.put("./templates/sdk_install.tgz", HOME_PATH + file_name)
     # sftp.close()
-    target="/opt/sdk_install.tgz"
+    target = "/opt/sdk_install.tgz"
 
-    #now move the file to the sudo required area!
+    # now move the file to the sudo required area!
     stdin, stdout, stderr = ssh.exec_command(
         "sudo -S -p '' mv {} {}".format(HOME_PATH+file_name, target))
     stdin.write(globalvar.ssh_password + "\n")
     stdin.flush()
-
 
     # ssh_sendfile(localpath='./11.txt', remotepath='/tmp/22.txt')
     # cmd = "pwd"
@@ -76,7 +76,6 @@ def setup_SDK(trans):
     # print(stdout.read().decode())
     stdin.write(globalvar.ssh_password + "\n")
     stdin.flush()
-
 
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -100,7 +99,6 @@ def setup_SDK(trans):
 
     stdin.write(globalvar.ssh_password + "\n")
     stdin.flush()
-
 
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -163,17 +161,20 @@ def ssh_sed(ssh, find, insert, filename):
     stdin.write(globalvar.ssh_password + "\n")
     stdin.flush()
 
+
 def read_sysconf():
     config.read("./configs/template.cfg", encoding='utf-8')
     ip = config["sysConfig"]["ip"]
     port = int(config["sysConfig"]["port"])
     return {"ip": ip, "port": port}
 
+
 def read_paramfile():
     config.read("./configs/template.cfg", encoding='utf-8')
     host = config["paramFile"]["host"]
     port = int(config["paramFile"]["port"])
     return {"host": host, "port": port}
+
 
 def read_config_ssal(id):
     """获得文件的配置信息
@@ -193,7 +194,7 @@ def read_config_ssal(id):
     local_ip2 = config["DEFAULT"]["local_ip2"]
     local_port2 = int(config["DEFAULT"]["local_port2"])
     return {
-        "id":id,
+        "id": id,
         "gw_ip": gw_ip,
         "gw_port": gw_port,
         "dst_ip1": dst_ip1,
@@ -216,12 +217,12 @@ def set_ssal_conf(trans, id):
         filename + ".j2", filename, dict)
 
     ssh_sendfile("./target/" + filename, HOME_PATH + filename)
-    path="/sdk"
+    path = "/sdk"
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh._transport = trans
     stdin, stdout, stderr = ssh.exec_command(
-        "sudo -S -p '' cp -rf {} {}".format(HOME_PATH + filename,path))
+        "sudo -S -p '' cp -rf {} {}".format(HOME_PATH + filename, path))
     stdin.write(globalvar.ssh_password + "\n")
     stdin.flush()
     bar.printStatus("ssal_conf.json 安装")
@@ -236,7 +237,6 @@ def set_paramFile(trans):
 
     # ssh_sendfile("./target/" + filename, path)
     ssh_sendfile("./target/" + filename, HOME_PATH + filename)
-
 
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -254,7 +254,6 @@ def set_paramFile(trans):
     stdin.write(globalvar.ssh_password + "\n")
     stdin.flush()
 
-
     bar.printStatus(filename+" 安装")
 
 
@@ -264,13 +263,13 @@ def set_sysConf(trans):
     jinja.renderfile(
         filename + ".j2", filename, dict)
 
-    path="/etc/"+filename
+    path = "/etc/"+filename
     ssh_sendfile("./target/" + filename, HOME_PATH + filename)
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh._transport = trans
     stdin, stdout, stderr = ssh.exec_command(
-        "sudo -S -p '' cp -rf {} {}".format(HOME_PATH + filename,path))
+        "sudo -S -p '' cp -rf {} {}".format(HOME_PATH + filename, path))
     stdin.write(globalvar.ssh_password + "\n")
     stdin.flush()
     bar.printStatus(filename+" 安装")
@@ -280,6 +279,7 @@ def renderfile(trans, id):
     set_ssal_conf(trans, id)
     set_sysConf(trans)
     set_paramFile(trans)
+
 
 def addvpn(trans):
     config.read("./configs/template.cfg", encoding='utf-8')
@@ -303,13 +303,14 @@ def addvpn(trans):
     stdin.flush()
     bar.printStatus("vpn 安装")
 
+
 def rebootSystem(trans):
     """发送系统重启命令
 
     Args:
         trans ([type]): [ssh trans]
     """
-    str="sudo reboot"
+    str = "sudo reboot"
     ssh = paramiko.SSHClient()
     ssh._transport = trans
     ssh_command(ssh, str)
@@ -346,26 +347,25 @@ def pingmain(trans):
     main_ip = config["DEFAULT"]["main_ip"]
     device_ip = config["DEFAULT"]["device_ip"]
 
-
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh._transport = trans
 
     command = "ping -c 5 {}"
 
-
-    ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(command.format(main_ip))
+    ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(
+        command.format(main_ip))
     bar.printStatus("测试主站:{}".format(main_ip))
     output = ssh_stdout.read().decode()
     error = ssh_stderr.read().decode()
     # print(output)
     if str(output).find('5 packets received') > 0:
-        #这是绿色字体
+        # 这是绿色字体
         print("\033[32m测试主站成功!\033[0m")
     elif str(output).find('0 packets received') > 0:
-        #这是红色字体
+        # 这是红色字体
         print("\033[31;测试主站失败!\033[0m")
-    
+
     ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(
         command.format(device_ip))
     bar.printStatus("测试物管平台:{}".format(device_ip))
@@ -373,16 +373,33 @@ def pingmain(trans):
     error = ssh_stderr.read().decode()
     # print(output)
     if str(output).find('5 packets received') > 0:
-        #这是绿色字体
+        # 这是绿色字体
         print("\033[32m测试物管平台成功!\033[0m")
     elif str(output).find('0 packets received') > 0:
-        #这是红色字体
-        print("\033[31;1m测试物管平台失败!\033[0m") 
+        # 这是红色字体
+        print("\033[31;1m测试物管平台失败!\033[0m")
 
 
+def readEsn():
+    """
+        [从configs的esn.csv文件读取esn信息]
+
+    Returns:
+        [dict]: [返回esn码为key的list]
+    """
+    from collections import defaultdict
+
+    with open("./configs/esn.csv") as f:
+        my_list = list(f)
+    dict = defaultdict(list)
+
+    for list in my_list:
+        data = list.split(",")
+        dict[data[0]] = data[1:]
+    return dict
 
 
 if __name__ == "__main__":
     # logger = setup_logging("logs/", "main")
     # main()
-    pass
+    readEsn()

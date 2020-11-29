@@ -1,5 +1,6 @@
 # coding: utf-8
-
+"""注册码的生成以及验证
+"""
 import win32api
 import pyDes
 from binascii import b2a_hex, a2b_hex
