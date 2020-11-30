@@ -9,7 +9,7 @@ import globalvar
 sftp = None
 
 RC_LOCAL_PATH = "/etc/rc.local"
-
+paramiko.util.log_to_file('./logs/ssh.log') # sets up logging
 
 def login(config_file):
 
@@ -80,13 +80,39 @@ def setup_SDK(trans):
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh._transport = trans
-    cmd = "cd /opt;sudo -S -p '' ./install_ssal_sdk.sh"
+    # cmd = ""
+    # ssh_command(ssh, cmd, True)
+    # stdin, stdout, stderr = ssh.exec_command(cmd)
+    # print(stdout.read().decode())
+    cmd = "cd /opt;sudo -S -p '' /opt/install_ssal_sdk.sh"
     # ssh_command(ssh, cmd, True)
     stdin, stdout, stderr = ssh.exec_command(cmd)
     # print(stdout.read().decode())
 
     stdin.write(globalvar.ssh_password + "\n")
     stdin.flush()
+
+    # ssh = paramiko.SSHClient()
+    # ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    # ssh._transport = trans
+    # cmd = "sudo rm -rf /sdk"
+    # # ssh_command(ssh, cmd, True)
+    # stdin, stdout, stderr = ssh.exec_command(cmd)
+    # # print(stdout.read().decode())
+
+    # stdin.write(globalvar.ssh_password + "\n")
+    # stdin.flush()
+
+    # ssh = paramiko.SSHClient()
+    # ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    # ssh._transport = trans
+    # cmd = "cd /opt ; sudo -S -p '' ./install_ssal_sdk.sh"
+    # # ssh_command(ssh, cmd, True)
+    # stdin, stdout, stderr = ssh.exec_command(cmd)
+    # # print(stdout.read().decode())
+
+    # stdin.write(globalvar.ssh_password + "\n")
+    # stdin.flush()
 
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -169,11 +195,12 @@ def read_sysconf():
     return {"ip": ip, "port": port}
 
 
-def read_paramfile():
+def read_paramfile(trans):
     config.read("./configs/template.cfg", encoding='utf-8')
     host = config["paramFile"]["host"]
     port = int(config["paramFile"]["port"])
-    return {"host": host, "port": port}
+    esncode = queryEsn(trans)
+    return {"host": host, "port": port, "esncode": esncode}
 
 
 def read_config_ssal(id):
@@ -230,7 +257,7 @@ def set_ssal_conf(trans, id):
 
 def set_paramFile(trans):
     filename = "paramFile"
-    dict = read_paramfile()
+    dict = read_paramfile(trans)
     jinja.renderfile(
         filename + ".j2", filename, dict)
     path = "/data/app/SCMQTTIot/configFile/paramFile"
@@ -361,10 +388,10 @@ def pingmain(trans):
     # print(output)
     if str(output).find('5 packets received') > 0:
         # 这是绿色字体
-        print("\033[32m测试主站成功!\033[0m")
+        print("测试主站成功!")
     elif str(output).find('0 packets received') > 0:
         # 这是红色字体
-        print("\033[31;测试主站失败!\033[0m")
+        print("测试主站失败!")
 
     ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(
         command.format(device_ip))
@@ -374,10 +401,10 @@ def pingmain(trans):
     # print(output)
     if str(output).find('5 packets received') > 0:
         # 这是绿色字体
-        print("\033[32m测试物管平台成功!\033[0m")
+        print("测试物管平台成功!")
     elif str(output).find('0 packets received') > 0:
         # 这是红色字体
-        print("\033[31;1m测试物管平台失败!\033[0m")
+        print("测试物管平台失败!")
 
 
 def readEsn():

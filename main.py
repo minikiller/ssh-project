@@ -68,7 +68,7 @@ def main(client_config="configs/system.cfg", debug=None):
                 print("成功退出... !\n")
                 sys.exit()
             else:
-                print("\033[31;1m请重新选择！\033[0m")
+                print("请重新选择!")
 
         except KeyboardInterrupt:
             # initiator.stop()
@@ -76,7 +76,7 @@ def main(client_config="configs/system.cfg", debug=None):
             sys.exit()
         except ValueError:
             # Handle the exception
-            print('\033[31;1m请输入数字!\033[0m')
+            print('请输入数字!')
 
 
 def installSdk(client_config, logger):

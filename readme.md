@@ -24,3 +24,6 @@ createCode()
 ```
 pyinstaller --onefile main.py
 ```
+### bug
+
+Socket exception: 远程主机强迫关闭了一个现有的连接。 (10054)
