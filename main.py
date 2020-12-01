@@ -42,11 +42,15 @@ def main(client_config="configs/system.cfg", debug=None):
                     "输入选项 :- "
                     "\n0. 退出"
                     "\n1. 安装SDK"
-                    "\n2. 秘钥导入"
+                    "\n2. 秘钥导入(将重启)"
                     "\n3. 修改安全代理文件"
                     "\n4. 查询ESN码"
                     "\n5. add vpn"
-                    "\n6. ping 主站测试"
+                    "\n6. 增加vpn通道"
+                    "\n7. 修改回执文件"
+                    "\n8. ping 主站测试"
+                    "\n9. 重启设备"
+                    "\n10. 删除sdk"
                     "\n> "
                 )
             )
@@ -63,7 +67,15 @@ def main(client_config="configs/system.cfg", debug=None):
             elif choice == 5:
                 addvpn()
             elif choice == 6:
+                createvpn()
+            elif choice == 7:
+                callback()
+            elif choice == 8:
                 pingmain()
+            elif choice == 9:
+                reboot()
+            elif choice == 10:
+                deleteSdk()
             elif choice == 0:
                 print("成功退出... !\n")
                 sys.exit()
@@ -107,6 +119,22 @@ def queryEsn():
 
 def pingmain():
     ssh.pingmain(globalvar.trans)
+
+
+def createvpn():
+    ssh.createvpn(globalvar.trans)
+
+
+def callback():
+    ssh.callback(globalvar.trans)
+
+
+def reboot():
+    ssh.rebootSystem(globalvar.trans)
+
+
+def deleteSdk():
+    ssh.deleteSdk(globalvar.trans)
 
 
 if __name__ == "__main__":

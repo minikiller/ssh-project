@@ -1,0 +1,8 @@
+#iface FE0 inet manual
+auto FE0
+allow-hotplug FE0
+iface FE0 inet static
+address 192.168.1.101
+netmask 255.255.255.0
+gateway 192.168.1.254
+dns-nameservers 192.168.1.240

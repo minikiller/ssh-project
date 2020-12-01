@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="gb2312" standalone="no"?>
-<!-- 閰嶇疆淇℃伅-->
+<!-- 配置信息-->
 <Config>
   <ConfigData>
-    <ConfigItem Inaddr="1" V_Value="1" SigDes="涓氬姟鏁版嵁鍐呭"/>
-    <ConfigItem Inaddr="2" V_Value="192.101.2.1" SigDes="涓氬姟涓荤珯IP鍦板潃"/>
-    <ConfigItem Inaddr="3" V_Value="5051" SigDes="涓氬姟涓荤珯绔彛"/>
-    <ConfigItem Inaddr="4" V_Value="172.17.0.1" SigDes="涓氬姟瀹瑰櫒IP鍦板潃"/>
-    <ConfigItem Inaddr="5" V_Value="2404" SigDes="涓氬姟瀹瑰櫒绔彛"/>
-    <ConfigItem Inaddr="6" V_Value="172.32.30.215" SigDes="绠＄悊涓荤珯IP鍦板潃"/>
-    <ConfigItem Inaddr="7" V_Value="24041" SigDes="绠＄悊涓荤珯绔彛"/>
-    <ConfigItem Inaddr="8" V_Value="T231315TR002201912190082" SigDes="缁堢ID"/>
-    <ConfigItem Inaddr="9" V_Value="10" SigDes="璁よ瘉杩囩▼瓒呮椂鏃堕棿(s)"/>
-    <ConfigItem Inaddr="10" V_Value="45" SigDes="AC 寤洪摼瓒呮椂鏃堕棿(s)"/>
-    <ConfigItem Inaddr="11" V_Value="1" SigDes="Debug鏃ュ織"/>
-    <ConfigItem Inaddr="12" V_Value="0" SigDes="涓氬姟閫氶亾妯″紡(0-IEC104 1-MQTT)"/>
-    <ConfigItem Inaddr="13" V_Value="1" SigDes="绠＄悊閫氶亾妯″紡(0-AGENT1 1-AGENT2)"/>
-    <ConfigItem Inaddr="14" V_Value="0" SigDes="SSAL浣胯兘(0-涓嶄娇鑳� 1-浣胯兘)"/>
+    <ConfigItem Inaddr="1" V_Value="1" SigDes="业务数据内容"/>
+    <ConfigItem Inaddr="2" V_Value="192.168.1.130" SigDes="业务主站IP地址"/>
+    <ConfigItem Inaddr="3" V_Value="2404" SigDes="业务主站端口"/>
+    <ConfigItem Inaddr="4" V_Value="192.168.1.130" SigDes="业务容器IP地址"/>
+    <ConfigItem Inaddr="5" V_Value="1000" SigDes="业务容器端口"/>
+    <ConfigItem Inaddr="6" V_Value="172.32.30.215" SigDes="管理主站IP地址"/>
+    <ConfigItem Inaddr="7" V_Value="24041" SigDes="管理主站端口"/>
+    <ConfigItem Inaddr="8" V_Value="T231315TR002201912190082" SigDes="终端ID"/>
+    <ConfigItem Inaddr="9" V_Value="10" SigDes="认证过程超时时间(s)"/>
+    <ConfigItem Inaddr="10" V_Value="45" SigDes="AC 建链超时时间(s)"/>
+    <ConfigItem Inaddr="11" V_Value="1" SigDes="Debug日志"/>
+    <ConfigItem Inaddr="12" V_Value="0" SigDes="业务通道模式(0-IEC104 1-MQTT)"/>
+    <ConfigItem Inaddr="13" V_Value="1" SigDes="管理通道模式(0-AGENT1 1-AGENT2)"/>
+    <ConfigItem Inaddr="14" V_Value="0" SigDes="SSAL使能(0-不使能 1-使能)"/>
   </ConfigData> 
 </Config>

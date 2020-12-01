@@ -9,7 +9,8 @@ import globalvar
 sftp = None
 
 RC_LOCAL_PATH = "/etc/rc.local"
-paramiko.util.log_to_file('./logs/ssh.log') # sets up logging
+paramiko.util.log_to_file('./logs/ssh.log')  # sets up logging
+
 
 def login(config_file):
 
@@ -28,6 +29,7 @@ def login(config_file):
     # 建立连接
     trans.connect(username=ssh_username, password=globalvar.ssh_password)
     bar.printStatus("ssh 登陆")
+    print("登录{}成功！".format(ssh_ip))
     return trans
 
 
@@ -114,9 +116,9 @@ def setup_SDK(trans):
     # stdin.write(globalvar.ssh_password + "\n")
     # stdin.flush()
 
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh._transport = trans
+    # ssh = paramiko.SSHClient()
+    # ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    # ssh._transport = trans
 
     cmd = "sudo -S -p '' chmod 755 /sdk"
     # ssh_command(ssh, cmd, True)
@@ -129,15 +131,12 @@ def setup_SDK(trans):
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh._transport = trans
-    str = "/bin/bash /sdk/start_ssal_sdk.sh & "
+    _str = "/bin/bash /sdk/start_ssal_sdk.sh & "
     cmd = 'sudo -S -p "" sed -i "/{}/i\{}" {}'.format(
-        "exit 0", str, RC_LOCAL_PATH)
-    # ssh_command(ssh, str)
-    # print(str)
+        "exit 0", _str, RC_LOCAL_PATH)
     stdin, stdout, stderr = ssh.exec_command(cmd)
     stdin.write(globalvar.ssh_password + "\n")
     stdin.flush()
-    # ssh_sed(ssh, , str, RC_LOCAL_PATH)
 
     bar.printStatus("SDK 安装...")
 
@@ -331,17 +330,72 @@ def addvpn(trans):
     bar.printStatus("vpn 安装")
 
 
+def createvpn(trans):
+    #     /etc/ppp
+    # 删除ip-up文件，命令为sudo rm -rf /etc/ppp/ip-up
+    # 添加新的ip-up文件  命令为：sudo rz
+    # sudo chmod +x ip-up
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh._transport = trans
+    filename = "ip-up"
+    path = "/etc/ppp/"
+    stdin, stdout, stderr = ssh.exec_command(
+        "sudo -S -p '' rm -rf {}".format(path+filename))
+    stdin.write(globalvar.ssh_password + "\n")
+    stdin.flush()
+
+    sftp = ssh.open_sftp()
+
+    file_name = "ip-up"
+    # sftp.put(localpath=localpath, remotepath=remotepath)
+    sftp.put("./templates/"+file_name, HOME_PATH + file_name)
+
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh._transport = trans
+    filename = "ip-up"
+    path = "/etc/ppp/"
+    stdin, stdout, stderr = ssh.exec_command(
+        "sudo -S -p '' mv {} {}".format(HOME_PATH+filename, path+filename))
+    stdin.write(globalvar.ssh_password + "\n")
+    stdin.flush()
+
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh._transport = trans
+    filename = "ip-up"
+    path = "/etc/ppp/"
+    stdin, stdout, stderr = ssh.exec_command(
+        "sudo -S -p '' chmod +x {}".format(path+filename))
+    stdin.write(globalvar.ssh_password + "\n")
+    stdin.flush()
+
+    bar.printStatus("增加vpn通道"+"安装")
+
+
+def callback(trans):
+    """添加回执文件的修改
+
+    Args:
+        trans ([type]): [description]
+    """
+    pass
+
+
 def rebootSystem(trans):
     """发送系统重启命令
 
     Args:
         trans ([type]): [ssh trans]
     """
-    str = "sudo reboot"
+    str = "sudo -S -p '' reboot"
     ssh = paramiko.SSHClient()
     ssh._transport = trans
-    ssh_command(ssh, str)
-    ssh.close()
+    stdin, stdout, stderr = ssh.exec_command(str)
+    stdin.write(globalvar.ssh_password + "\n")
+    stdin.flush()
+    # ssh.close()
 
 
 def queryEsn(trans):
@@ -386,12 +440,12 @@ def pingmain(trans):
     output = ssh_stdout.read().decode()
     error = ssh_stderr.read().decode()
     # print(output)
-    if str(output).find('5 packets received') > 0:
+    if str(output).find('5 received') > 0:
         # 这是绿色字体
-        print("测试主站成功!")
-    elif str(output).find('0 packets received') > 0:
+        print("测试主站{}成功!".format(main_ip))
+    elif str(output).find('0 received') > 0:
         # 这是红色字体
-        print("测试主站失败!")
+        print("测试主站{}失败!".format(main_ip))
 
     ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(
         command.format(device_ip))
@@ -399,12 +453,23 @@ def pingmain(trans):
     output = ssh_stdout.read().decode()
     error = ssh_stderr.read().decode()
     # print(output)
-    if str(output).find('5 packets received') > 0:
+    if str(output).find('5 received') > 0:
         # 这是绿色字体
-        print("测试物管平台成功!")
-    elif str(output).find('0 packets received') > 0:
+        print("测试物管平台{}成功!".format(device_ip))
+    elif str(output).find('0 received') > 0:
         # 这是红色字体
-        print("测试物管平台失败!")
+        print("测试物管平台{}失败!".format(device_ip))
+
+
+def deleteSdk(trans):
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh._transport = trans
+    path = "/sdk"
+    stdin, stdout, stderr = ssh.exec_command(
+        "sudo -S -p '' rm -rf {}".format(path))
+    stdin.write(globalvar.ssh_password + "\n")
+    stdin.flush()
 
 
 def readEsn():
