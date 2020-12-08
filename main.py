@@ -41,7 +41,7 @@ def main(client_config="configs/system.cfg", debug=None):
                 input(
                     "输入选项 :- "
                     "\n0. 退出"
-                    "\n1. 安装SDK"
+                    "\n1. 安装SDK-1"
                     "\n2. 秘钥导入(将重启)"
                     "\n3. 修改安全代理文件"
                     "\n4. 查询ESN码"
@@ -51,6 +51,7 @@ def main(client_config="configs/system.cfg", debug=None):
                     "\n8. ping 主站测试"
                     "\n9. 重启设备"
                     "\n10. 删除sdk"
+                    # "\n11. 安装SDK-2"
                     "\n> "
                 )
             )
@@ -76,6 +77,8 @@ def main(client_config="configs/system.cfg", debug=None):
                 reboot()
             elif choice == 10:
                 deleteSdk()
+            # elif choice == 11:
+                # installfile()
             elif choice == 0:
                 print("成功退出... !\n")
                 sys.exit()
@@ -97,9 +100,12 @@ def installSdk(client_config, logger):
     ssh.setup_SDK(globalvar.trans)
     id = input("输入设备ID(只能5位):")
     ssh.renderfile(globalvar.trans, id)
+    
  # 关闭连接
     # globalvar.trans.close()
-
+def installfile():
+    id = input("输入设备ID(只能5位):")
+    ssh.renderfile(globalvar.trans, id)
 
 def installSecurity():
     security.setup()

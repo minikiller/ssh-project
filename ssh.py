@@ -2,8 +2,10 @@ import paramiko
 import bar
 from log import logger
 import jinja
+from collections import defaultdict
 from globalvar import config, HOME_PATH
 import globalvar
+import time
 
 # trans = None
 sftp = None
@@ -79,6 +81,7 @@ def setup_SDK(trans):
     stdin.write(globalvar.ssh_password + "\n")
     stdin.flush()
 
+    time.sleep(1)
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh._transport = trans
@@ -86,7 +89,7 @@ def setup_SDK(trans):
     # ssh_command(ssh, cmd, True)
     # stdin, stdout, stderr = ssh.exec_command(cmd)
     # print(stdout.read().decode())
-    cmd = "cd /opt;sudo -S -p '' /opt/install_ssal_sdk.sh"
+    cmd = "cd /opt;sudo -S -p '' ./install_ssal_sdk.sh"
     # ssh_command(ssh, cmd, True)
     stdin, stdout, stderr = ssh.exec_command(cmd)
     # print(stdout.read().decode())
@@ -128,15 +131,15 @@ def setup_SDK(trans):
     stdin.write(globalvar.ssh_password + "\n")
     stdin.flush()
 
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh._transport = trans
-    _str = "/bin/bash /sdk/start_ssal_sdk.sh & "
-    cmd = 'sudo -S -p "" sed -i "/{}/i\{}" {}'.format(
-        "exit 0", _str, RC_LOCAL_PATH)
-    stdin, stdout, stderr = ssh.exec_command(cmd)
-    stdin.write(globalvar.ssh_password + "\n")
-    stdin.flush()
+    # ssh = paramiko.SSHClient()
+    # ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    # ssh._transport = trans
+    # _str = "/bin/bash /sdk/start_ssal_sdk.sh & "
+    # cmd = 'sudo -S -p "" sed -i "/{}/i\{}" {}'.format(
+    #     "exit 0", _str, RC_LOCAL_PATH)
+    # stdin, stdout, stderr = ssh.exec_command(cmd)
+    # stdin.write(globalvar.ssh_password + "\n")
+    # stdin.flush()
 
     bar.printStatus("SDK 安装...")
 
@@ -380,7 +383,43 @@ def callback(trans):
     Args:
         trans ([type]): [description]
     """
-    pass
+
+    filename = "paramFile"
+    _dict = read_paramfile(trans)
+    data = readEsn()
+    esn = _dict["esncode"].strip()
+    print("esn code {}".format(esn))
+    calldata = data[esn]
+    if (len(calldata) == 0):
+        print("未找到对应的esn码!")
+        return
+    _dict["client_id"] = calldata[0]
+    _dict["username"] = calldata[1]
+    _dict["password"] = calldata[2]
+
+    jinja.renderfile(
+        filename + ".j2", filename, _dict)
+    path = "/data/app/SCMQTTIot/configFile/paramFile"
+
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh._transport = trans
+    sftp = ssh.open_sftp()
+    sftp.put("./target/" + filename, HOME_PATH + filename)
+    stdin, stdout, stderr = ssh.exec_command(
+        "sudo -S -p '' rm -rf {}".format(path))
+    stdin.write(globalvar.ssh_password + "\n")
+    stdin.flush()
+
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh._transport = trans
+    stdin, stdout, stderr = ssh.exec_command(
+        "sudo -S -p '' mv {} {}".format(HOME_PATH+filename, path))
+    stdin.write(globalvar.ssh_password + "\n")
+    stdin.flush()
+
+    bar.printStatus("回执文件安装")
 
 
 def rebootSystem(trans):
@@ -478,20 +517,25 @@ def readEsn():
 
     Returns:
         [dict]: [返回esn码为key的list]
+        key为esn，
+        data1为clientid
+        data2为userid
+        data3为password
     """
-    from collections import defaultdict
 
+    my_list = []
     with open("./configs/esn.csv") as f:
         my_list = list(f)
-    dict = defaultdict(list)
+    _dict = defaultdict(list)
 
-    for list in my_list:
-        data = list.split(",")
-        dict[data[0]] = data[1:]
-    return dict
+    for _list in my_list:
+        data = _list.strip('\n').split(",")
+        _dict[data[0].strip()] = data[1:]
+    return _dict
 
 
 if __name__ == "__main__":
     # logger = setup_logging("logs/", "main")
     # main()
-    readEsn()
+    data = readEsn()
+    print((data['1001202502704964'][0]))

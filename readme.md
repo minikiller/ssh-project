@@ -61,3 +61,11 @@ sysadm@SCT230A:~$
 /bin/bash /sdk/start_ssal_sdk.sh &
 exit 0
 ```
+
+```
+sudo netstat -nap|grep ssal 
+```
+
+```
+pyinstaller --onefile main.py
+```
