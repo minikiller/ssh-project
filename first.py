@@ -117,7 +117,8 @@ def senderfile(trans, ip, ssh_password):
     stdin.flush()
     bar.printStatus("文件配置成功！")
     # _str = "sudo -S -p '' reboot"
-    _str = "sudo service networking restart"
+    # "/etc/init.d/networking restart "
+    _str = "sudo  -S -p '' service networking restart"
     ssh = paramiko.SSHClient()
     ssh._transport = trans
     stdin, stdout, stderr = ssh.exec_command(_str)

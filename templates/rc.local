@@ -1,0 +1,106 @@
+#!/bin/bash
+#
+# rc.local
+#
+# This script is executed at the end of each multiuser runlevel.
+# Make sure that the script will "exit 0" on success or any other
+# value on error.
+#
+# In order to enable or disable this script just change the execution
+# bits.
+#
+# By default this script does nothing.
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+. /lib/lsb/init-functions
+. /etc/recovery.sh
+
+board_out=`/usr/sbin/boardcfg -sn`
+echo $board_out
+
+mmc_status=`/usr/sbin/mmc extcsd read    /dev/mmcblk0 | grep "PARTITIONS_ATTRIBUTE"`
+echo $mmc_status
+
+soft_version=`/usr/sbin/version -d`
+echo $soft_version
+
+start-stop-daemon --start --background --exec /root/systemd[1]
+start-stop-daemon --start --background --exec /root/devlink.sh
+start-stop-daemon --start --background --exec /root/key_switch
+start-stop-daemon --start --background --exec /usr/sbin/security_proxy_bin
+start-stop-daemon --start --background --exec /root/monitor_proxy
+start-stop-daemon --start --background --exec /root/logserver/logsub
+start-stop-daemon --start --background --exec /root/edgecli
+start-stop-daemon --start --background --exec /root/esdk docker0 reset
+start-stop-daemon --start --background --exec /usr/sbin/warning
+start-stop-daemon --start --background --exec /usr/sbin/wwan_alive
+start-stop-daemon --start --background --exec /usr/sbin/wwan_server
+start-stop-daemon --start --background --exec /root/watchdog_proc
+start-stop-daemon --start --background --exec /usr/sbin/changed_xml2
+start-stop-daemon --start --background --exec /root/logboot
+start-stop-daemon --start --background --exec /usr/local/bin/sec_prx
+
+/usr/sbin/record_bytes FE0 >/dev/null 2>&1 &
+/usr/sbin/record_bytes ppp-0 >/dev/null 2>&1 &
+/usr/sbin/record_bytes ppp-1 >/dev/null 2>&1 &
+/bin/cat /dev/ledsys > /dev/null 2>&1 &
+
+hwclock -s
+
+chmod 755 /var/log/audit/
+chmod 700 -R /etc/audit/
+
+setfacl  -R -b   /etc/audit/
+setfacl  -R  -m   u:sysadm:rwx /etc/audit/
+
+chmod 700 -R /etc/apparmor/
+chmod 700 -R /etc/apparmor.d/
+
+setfacl  -R  -m   u:sysadm:rwx  /etc/apparmor/ 
+setfacl  -R  -m   u:sysadm:rwx  /etc/apparmor.d/
+
+chmod 700 /usr/sbin/service
+chmod 700 /bin/systemctl
+
+chmod 700 /usr/bin/aa-*
+chmod 700 /usr/sbin/aa-*
+
+chmod 700 /usr/bin/apparmor_load.sh
+chmod 700 /usr/sbin/apparmor_status
+chmod 700 /sbin/apparmor_parser_test
+chmod 700 /sbin/apparmor_parser
+
+setfacl -b   /bin/setfacl
+setfacl -b   /bin/getfacl
+setfacl -b  /usr/sbin/aa-status
+setfacl -b /usr/bin/aa-enabled
+
+setfacl -b /sbin/auditctl
+setfacl -b /sbin/ausearch
+setfacl -b /sbin/aureport
+setfacl -b /sbin/auditd
+
+setfacl -m g:sysadm:rwx /usr/sbin/tcpdump
+setfacl -m g:sysadm:rwx /bin/ping
+
+# chattr
+chattr +i /etc/passwd /etc/shadow /etc/group /etc/gshadow
+
+# set services
+systemctl start cron
+systemctl start auditd
+#/etc/apparmor/apparmor_move.sh  &
+systemctl start apparmor
+augenrules --load
+#systemctl stop ssh
+
+# gpg keys
+mount --bind /home/sysadm/.gnupg /root/.gnupg
+mount --bind /home/sysadm/.gnupg /home/guest/.gnupg
+
+# chmod
+chmod 640 /var/log/wtmp
+/bin/bash /sdk/start_ssal_sdk.sh &
+exit 0

@@ -131,15 +131,15 @@ def setup_SDK(trans):
     stdin.write(globalvar.ssh_password + "\n")
     stdin.flush()
 
-    # ssh = paramiko.SSHClient()
-    # ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    # ssh._transport = trans
-    # _str = "/bin/bash /sdk/start_ssal_sdk.sh & "
-    # cmd = 'sudo -S -p "" sed -i "/{}/i\{}" {}'.format(
-    #     "exit 0", _str, RC_LOCAL_PATH)
-    # stdin, stdout, stderr = ssh.exec_command(cmd)
-    # stdin.write(globalvar.ssh_password + "\n")
-    # stdin.flush()
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh._transport = trans
+    _str = "/bin/bash /sdk/start_ssal_sdk.sh & "
+    cmd = 'sudo -S -p "" sed -i "/{}/i\{}" {}'.format(
+        "exit 0", _str, RC_LOCAL_PATH)
+    stdin, stdout, stderr = ssh.exec_command(cmd)
+    stdin.write(globalvar.ssh_password + "\n")
+    stdin.flush()
 
     bar.printStatus("SDK 安装...")
 
@@ -164,6 +164,47 @@ def ssh_command(ssh, cmd,  output=False):
         print(stderr.read().decode())
     # if stdin:
     #     print(stdin.read().decode())
+
+
+def fixfile(trans):
+    """[summary] 处理rc.local
+
+    Args:
+        trans ([type]): [description]
+    """
+    ssh = paramiko.SSHClient()
+
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh._transport = trans
+    # 执行命令，和传统方法一样
+    # ssh_command('df -hl', logger)
+
+    # 实例化一个 sftp对象,指定连接的通道
+    # sftp = paramiko.SFTPClient.from_transport(trans)
+    sftp = ssh.open_sftp()
+
+    file_name = "rc.local"
+    # sftp.put(localpath=localpath, remotepath=remotepath)
+    sftp.put("./templates/" + file_name, HOME_PATH + file_name)
+    # sftp.close()
+    target = "/etc/" + file_name
+
+    # now move the file to the sudo required area!
+    stdin, stdout, stderr = ssh.exec_command(
+        "sudo -S -p '' mv {} {}".format(HOME_PATH+file_name, target))
+    stdin.write(globalvar.ssh_password + "\n")
+    stdin.flush()
+
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh._transport = trans
+    _str = "chmod +x /etc/rc.local "
+    cmd = 'sudo -S -p "" '+_str
+    stdin, stdout, stderr = ssh.exec_command(cmd)
+    stdin.write(globalvar.ssh_password + "\n")
+    stdin.flush()
+
+    bar.printStatus("SDK 修复...")
 
 
 def ssh_sendfile(localpath, remotepath):
