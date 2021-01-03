@@ -371,6 +371,26 @@ def addvpn(trans):
     stdin.flush()
     stdin.write("ppp-0\n")
     stdin.flush()
+
+    # config.read("./configs/template.cfg", encoding='utf-8')
+    apn_name = config["wwan_vpn1"]["apn_name"]
+    pap_name = config["wwan_vpn1"]["pap_name"]
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh._transport = trans
+    stdin, stdout, stderr = ssh.exec_command("wwan apn add")
+    stdin.write(apn_name + "\n")
+    stdin.flush()
+    stdin.write("\n")
+    stdin.flush()
+    stdin.write("\n")
+    stdin.flush()
+    stdin.write(pap_name + "\n")
+    stdin.flush()
+    stdin.write("0\n")
+    stdin.flush()
+    stdin.write("ppp-1\n")
+    stdin.flush()
     bar.printStatus("vpn 安装")
 
 
